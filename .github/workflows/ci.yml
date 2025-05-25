@@ -24,10 +24,6 @@ jobs:
           curl -Ls https://astral.sh/uv/install.sh | sh
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-      - name: Install dependencies
-        run: |
-          uv pip install -r uv.lock
-
       - name: Run pre-commit checks
         run: |
           uv run pre-commit run --all-files
