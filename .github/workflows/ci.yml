@@ -28,15 +28,15 @@ jobs:
         run: |
           uv venv
           source .venv/bin/activate
-          uv pip install -r requirements.txt
-          uv pip install pre-commit pytest
+          uv install
+
 
       - name: Run pre-commit checks
         run: |
           source .venv/bin/activate
-          pre-commit run --all-files
+          uv run pre-commit run --all-files
 
       - name: Run tests
         run: |
           source .venv/bin/activate
-          python -m pytest tests
+          uv run python -m pytest tests
