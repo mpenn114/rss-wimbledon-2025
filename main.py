@@ -1,6 +1,4 @@
-def main():
-    print("Hello from python-template!")
+from src.main_package.model.train import train_model
 
-
-if __name__ == "__main__":
-    main()
+overall_rmse = train_model()
+print(f"Overall RMSE score: {overall_rmse}")
