@@ -64,7 +64,7 @@ def create_estimated_true_probs(combined_df: pd.DataFrame, male_data:bool) -> pd
     # Bin(3,q) >=2 = p and we want Bin(5,q) >= 3
     # q^3 + 3q^2(1-q) = p
     three_set_grid_q = (0.5 + np.arange(10_000))/10000
-    three_set_grid_prob = np.power(three_set_grid_q,3) + 3*np.power(three_set_grid_q,2)
+    three_set_grid_prob = np.power(three_set_grid_q,3) + 3*np.power(three_set_grid_q,2)*(1-three_set_grid_q)
 
     if male_data:
         # Adjust the probabilities to be for five sets
