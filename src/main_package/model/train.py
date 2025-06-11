@@ -3,7 +3,7 @@ from src.main_package.data.load_data import load_data
 from datetime import date
 import numpy as np
 from scipy.optimize import minimize
-from typing import Tuple
+from typing import Tuple, Optional, Dict
 
 
 def train_model(
@@ -11,7 +11,8 @@ def train_model(
     clay_weight: float = 0.8,
     hard_weight: float = 0.9,
     male_data: bool = True,
-) -> float:
+    return_player_strengths:bool = False
+) -> Tuple[float, Optional[Dict[str,float]]]:
     """
     Train the model.
 
@@ -34,6 +35,7 @@ def train_model(
 
     Returns:
         float: The average RMSE over the years 2022-2024
+        Optional[np.ndarray]: The player strengths
     """
     training_dataset = load_data(male_data=male_data)
 
@@ -65,7 +67,7 @@ def train_model(
     for period in range(len(period_grouped_data)):
         period_data = period_grouped_data.get_group(period)
 
-        if period % 2 == 1:
+        if period % 2 == 1 and period > 7:
             print(f"Running forecast for period {period}...")
             forecast_objective, baseline_objective = run_wimbledon_forecast(
                 period_data, edge_weights, edge_values
@@ -74,8 +76,7 @@ def train_model(
                 f"""Wimbledon period {period} with RMSE {forecast_objective}
                     compared to baseline {baseline_objective}"""
             )
-            if period >= 7:
-                overall_rmse += forecast_objective
+            overall_rmse += forecast_objective
 
         # Calculate the decay in the weight
         max_date = period_data["match_date"].iloc[-1]
@@ -109,7 +110,12 @@ def train_model(
 
         # Update the previous weight date
         previous_period_end_date = max_date
-    return forecast_objective
+    if return_player_strengths:
+        player_strengths = create_player_strengths(edge_weights,edge_values)
+        player_strength_map = {name:strength for name,strength in zip(player_names, player_strengths)}
+        return forecast_objective, player_strength_map
+    else:
+        return forecast_objective, None
 
 
 def run_wimbledon_forecast(
