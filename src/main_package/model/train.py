@@ -7,9 +7,8 @@ from typing import Tuple, Optional, Dict
 
 
 def train_model(
-    temporal_decay: float = 0.4,
-    clay_weight: float = 0.8,
-    hard_weight: float = 0.9,
+    temporal_decay: float = 0.2,
+    grass_weight:float = 4.0,
     male_data: bool = True,
     return_player_strengths:bool = False
 ) -> Tuple[float, Optional[Dict[str,float]]]:
@@ -27,10 +26,8 @@ def train_model(
     Args:
         temporal_decay (float): The amount of decay that the weight we place
             on inter-player matches experiences in a year
-        clay_weight (float): The weight that we give to clay-court matches, relative
-            to grass-court
-        hard_weight (float): The weight that we give to hard-court matches, relative
-            to grass-court
+        grass_weight (float): The additional (multiplicative) weight we give to 
+            grass court matches
         male_data (bool): Whether or not we want the male data
 
     Returns:
@@ -86,8 +83,7 @@ def train_model(
         weight_decay = np.power(temporal_decay, date_difference / 365)
 
         # Add in surface weights
-        weight_decay[period_data["Surface"] == "Hard"] *= hard_weight
-        weight_decay[period_data["Surface"] == "Clay"] *= clay_weight
+        weight_decay[period_data["Surface"] == "Grass"] *= grass_weight
 
         # Decay the existing data in the weights matrix
         existing_decay_days = (
