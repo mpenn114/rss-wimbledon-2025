@@ -42,10 +42,6 @@ def predict_wimbledon_prize_money(male_data:bool) -> pd.DataFrame:
                 block_index -= 1
            
             # Calculate the probability of that player reaching the next round
-            print(win_probabilities[player, block_size*block_index:block_size*(block_index + 1)])
-            print(block_size)
-
-            print('___________')
             progression[round_index,player] = progression[round_index-1, player]*np.sum(
                 win_probabilities[player, block_size*block_index:block_size*(block_index + 1)]
                 * progression[round_index-1, block_size*block_index:block_size*(block_index + 1)]

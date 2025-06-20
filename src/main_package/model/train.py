@@ -64,7 +64,7 @@ def train_model(
     for period in range(len(period_grouped_data)):
         period_data = period_grouped_data.get_group(period)
 
-        if period % 2 == 1 and period > 7:
+        if period % 2 == 1 and period > 7 and not return_player_strengths:
             print(f"Running forecast for period {period}...")
             forecast_objective, baseline_objective = run_wimbledon_forecast(
                 period_data, edge_weights, edge_values
@@ -109,7 +109,7 @@ def train_model(
     if return_player_strengths:
         player_strengths = create_player_strengths(edge_weights,edge_values)
         player_strength_map = {name:strength for name,strength in zip(player_names, player_strengths)}
-        return forecast_objective, player_strength_map
+        return 0.0, player_strength_map
     else:
         return forecast_objective, None
 
