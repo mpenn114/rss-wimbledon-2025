@@ -8,10 +8,10 @@ from typing import Tuple, Optional, Dict
 
 def train_model(
     temporal_decay: float = 0.2,
-    grass_weight:float = 4.0,
+    grass_weight: float = 4.0,
     male_data: bool = True,
-    return_player_strengths:bool = False
-) -> Tuple[float, Optional[Dict[str,float]]]:
+    return_player_strengths: bool = False,
+) -> Tuple[float, Optional[Dict[str, float]]]:
     """
     Train the model.
 
@@ -26,7 +26,7 @@ def train_model(
     Args:
         temporal_decay (float): The amount of decay that the weight we place
             on inter-player matches experiences in a year
-        grass_weight (float): The additional (multiplicative) weight we give to 
+        grass_weight (float): The additional (multiplicative) weight we give to
             grass court matches
         male_data (bool): Whether or not we want the male data
 
@@ -107,8 +107,10 @@ def train_model(
         # Update the previous weight date
         previous_period_end_date = max_date
     if return_player_strengths:
-        player_strengths = create_player_strengths(edge_weights,edge_values)
-        player_strength_map = {name:strength for name,strength in zip(player_names, player_strengths)}
+        player_strengths = create_player_strengths(edge_weights, edge_values)
+        player_strength_map = {
+            name: strength for name, strength in zip(player_names, player_strengths)
+        }
         return 0.0, player_strength_map
     else:
         return forecast_objective, None

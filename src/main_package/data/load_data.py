@@ -38,7 +38,9 @@ def load_data(male_data: bool) -> pd.DataFrame:
     return combined_df.sort_values(by="match_date").reset_index(drop=True)
 
 
-def create_estimated_true_probs(combined_df: pd.DataFrame, male_data:bool) -> pd.DataFrame:
+def create_estimated_true_probs(
+    combined_df: pd.DataFrame, male_data: bool
+) -> pd.DataFrame:
     """
     Create the estimated true probabilities for results
 
@@ -55,27 +57,39 @@ def create_estimated_true_probs(combined_df: pd.DataFrame, male_data:bool) -> pd
     )
 
     five_set_mens_tournaments = [
-        'Australian Open',
-        'French Open',
-        'Wimbledon',
-        'US Open'
+        "Australian Open",
+        "French Open",
+        "Wimbledon",
+        "US Open",
     ]
     # We adjust the odds to be five-set specific if it is male data
     # Bin(3,q) >=2 = p and we want Bin(5,q) >= 3
     # q^3 + 3q^2(1-q) = p
-    three_set_grid_q = (0.5 + np.arange(10_000))/10000
-    three_set_grid_prob = np.power(three_set_grid_q,3) + 3*np.power(three_set_grid_q,2)*(1-three_set_grid_q)
+    three_set_grid_q = (0.5 + np.arange(10_000)) / 10000
+    three_set_grid_prob = np.power(three_set_grid_q, 3) + 3 * np.power(
+        three_set_grid_q, 2
+    ) * (1 - three_set_grid_q)
 
     if male_data:
         # Adjust the probabilities to be for five sets
-        three_set_filter = ~combined_df['Tournament'].isin(five_set_mens_tournaments)
-        
+        three_set_filter = ~combined_df["Tournament"].isin(five_set_mens_tournaments)
+
         # Change the winner probability
-        set_win_probs = np.interp(combined_df.loc[three_set_filter,'true_win_prob'].to_numpy().astype(float), three_set_grid_prob, three_set_grid_q)
-        five_set_win_probs = np.power(set_win_probs,5) + 5*np.power(set_win_probs,4)*(1-set_win_probs) + 10*np.power(set_win_probs,3)*np.power(1-set_win_probs,2)
-        combined_df.loc[three_set_filter,'true_win_prob'] = np.clip(five_set_win_probs,1e-4,1-1e-4)
-    
-    combined_df = combined_df.dropna(subset=['true_win_prob']).reset_index(drop=True)
+        set_win_probs = np.interp(
+            combined_df.loc[three_set_filter, "true_win_prob"].to_numpy().astype(float),
+            three_set_grid_prob,
+            three_set_grid_q,
+        )
+        five_set_win_probs = (
+            np.power(set_win_probs, 5)
+            + 5 * np.power(set_win_probs, 4) * (1 - set_win_probs)
+            + 10 * np.power(set_win_probs, 3) * np.power(1 - set_win_probs, 2)
+        )
+        combined_df.loc[three_set_filter, "true_win_prob"] = np.clip(
+            five_set_win_probs, 1e-4, 1 - 1e-4
+        )
+
+    combined_df = combined_df.dropna(subset=["true_win_prob"]).reset_index(drop=True)
     combined_df["additive_win_prob"] = np.log(
         (1 - combined_df["true_win_prob"].to_numpy())
         / combined_df["true_win_prob"].to_numpy()
