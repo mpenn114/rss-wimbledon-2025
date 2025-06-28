@@ -17,7 +17,7 @@ def load_data(male_data: bool) -> pd.DataFrame:
     # Iterate through the saved CSVs
     file_suffix = "men" if male_data else "women"
     loaded_dfs: List[pd.DataFrame] = []
-    for year in range(2019, 2025):
+    for year in range(2019, 2026):
         loaded_dfs.append(
             pd.read_csv(f"src/main_package/data/{year}_{file_suffix}.csv")
         )
@@ -33,7 +33,6 @@ def load_data(male_data: bool) -> pd.DataFrame:
     combined_df = combined_df.dropna(
         subset=["Winner", "Loser", "Surface", "Tournament", "true_win_prob"]
     )
-
     # Return the dataframe sorted by match date
     return combined_df.sort_values(by="match_date").reset_index(drop=True)
 
