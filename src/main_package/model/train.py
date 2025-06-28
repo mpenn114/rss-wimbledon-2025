@@ -203,7 +203,14 @@ def create_player_strengths(
 
     # Extract optimal strengths
     optimised_results = minimize(
-        player_ranking_objective, np.zeros(len(edge_weights)), method="L-BFGS-B"
+        player_ranking_objective,
+        np.zeros(len(edge_weights)),
+        method="L-BFGS-B",
+        options={
+            "maxiter": 100_000,  # or any large number
+            "maxfun": 100_000,  # optional, can be set if needed
+            "disp": True,  # optional, shows convergence messages
+        },
     )
     print(
         f"""Optimisation terminated with {optimised_results.message}

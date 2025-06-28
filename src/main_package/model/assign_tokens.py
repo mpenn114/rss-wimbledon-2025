@@ -6,7 +6,43 @@ from scipy.optimize import minimize
 from tqdm import tqdm
 
 
-def assign_tokens(expected_prize_money: pd.DataFrame, lucky_losers: List[str] = []):
+def assign_tokens(
+    expected_prize_money: pd.DataFrame,
+    lucky_losers: List[str] = [
+        "Blockx A.",
+        "Stewart H.",
+        "Ficovich J. P.",
+        "Garin C.",
+        "Klein L.",
+        "Landaluce M.",
+        "Watanuki Y.",
+        "Barrios T.",
+        "Droguet T.",
+        "Lajovic D.",
+        "Jacquet K.",
+        "Stricker D. S.",
+        "Tu L.",
+        "Fucsovics M.",
+        "Hassan B.",
+        "Pavlovic L.",
+        "Mboko V.",
+        "Kawa K.",
+        "Jones E.",
+        "Appleton E.",
+        "Montgomery R.",
+        "Tararudee L.",
+        "Valentova T.",
+        "Fett J.",
+        "Serban R.",
+        "Cornet A.",
+        "Naef C.",
+        "Garland J.",
+        "Sierra S.",
+        "Shibahara E.",
+        "Udvardy P.",
+        "Semenistaja D.",
+    ],
+):
     """
     Assign tokens to the players based on our model assumptions.
     """
