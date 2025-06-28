@@ -1,4 +1,13 @@
 import numpy as np
+from typing import TypedDict
+
+class ModelParameters(TypedDict):
+    """
+    Define the parameters used in the model
+    """
+    temporal_decay:float
+    grass_weight:float
+
 
 def define_prize_money() -> np.ndarray:
     """
@@ -17,3 +26,4 @@ def define_prize_money() -> np.ndarray:
         1_520_000,
         3_000_000
     ])
+
