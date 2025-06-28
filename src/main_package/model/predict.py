@@ -21,7 +21,11 @@ def predict_wimbledon_prize_money(male_data:bool, model_parameters:ModelParamete
 
     # Load the draw. We expect the CSV to contain players in the same order as the tree
     tournament_draw = load_draw(male_data)
-    player_strengths = tournament_draw['player_name'].map(player_strength_map).to_numpy()
+    player_strengths_pd = tournament_draw['player_name'].map(player_strength_map)
+    
+    # NB: This seems odd, but high ratings are worse throughout our model due to a hugely propagated sign error...
+    max_strength = np.max(player_strengths_pd[~pd.isna(player_strengths_pd)])
+    player_strengths = player_strengths_pd.fillna(max_strength).to_numpy()
     
     # Calculate the probability of each player beating each other player
     win_probabilities = 1 / (

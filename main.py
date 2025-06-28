@@ -26,7 +26,7 @@ def run_token_pipeline(train: bool = False):
     female_prize_money = predict_wimbledon_prize_money(False, parameters)
 
     # Concatenate the prize money from the two tournaments
-    combined_prize_money = pd.concat([male_prize_money, female_prize_money])
+    combined_prize_money = pd.concat([male_prize_money, female_prize_money]).sort_values(by='mean_prize_money',ascending=False)
     combined_prize_money.to_csv('mock_combined_prize_money.csv', index=False)
     combined_prize_money = pd.read_csv('mock_combined_prize_money.csv')
 
