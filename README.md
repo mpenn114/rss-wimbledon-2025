@@ -1,8 +1,7 @@
-### Python Template Repository
+### RSS Wimbledon 2025 Competition
 
-A simple template repository for Python projects. This repository sets up a minimal and modern Python development workflow using:
+This repository contains our entry to the Royal Statistical Society's 2025 Wimbledon competition (link)
 
-- pre-commit for automated code quality checks
-- ruff and black for linting and formatting
-- pytest for running tests
-- uv for fast dependency management and environment setup
+### Data
+
+Data was retrieved from http://www.tennis-data.co.uk/alldata.php on Saturday 28th June, 2025. Data from this website was converted to CSVs via https://cloudconvert.com/xlsx-to-csv for use in the code.

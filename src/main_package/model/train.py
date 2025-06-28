@@ -3,15 +3,15 @@ from src.main_package.data.load_data import load_data
 from datetime import date
 import numpy as np
 from scipy.optimize import minimize
-from typing import Tuple
+from typing import Tuple, Optional, Dict
 
 
 def train_model(
-    temporal_decay: float = 0.4,
-    clay_weight: float = 0.8,
-    hard_weight: float = 0.9,
+    temporal_decay: float = 0.2,
+    grass_weight: float = 4.0,
     male_data: bool = True,
-) -> float:
+    return_player_strengths: bool = False,
+) -> Tuple[float, Optional[Dict[str, float]]]:
     """
     Train the model.
 
@@ -26,14 +26,13 @@ def train_model(
     Args:
         temporal_decay (float): The amount of decay that the weight we place
             on inter-player matches experiences in a year
-        clay_weight (float): The weight that we give to clay-court matches, relative
-            to grass-court
-        hard_weight (float): The weight that we give to hard-court matches, relative
-            to grass-court
+        grass_weight (float): The additional (multiplicative) weight we give to
+            grass court matches
         male_data (bool): Whether or not we want the male data
 
     Returns:
         float: The average RMSE over the years 2022-2024
+        Optional[np.ndarray]: The player strengths
     """
     training_dataset = load_data(male_data=male_data)
 
@@ -65,7 +64,7 @@ def train_model(
     for period in range(len(period_grouped_data)):
         period_data = period_grouped_data.get_group(period)
 
-        if period % 2 == 1:
+        if period % 2 == 1 and period > 7 and not return_player_strengths:
             print(f"Running forecast for period {period}...")
             forecast_objective, baseline_objective = run_wimbledon_forecast(
                 period_data, edge_weights, edge_values
@@ -74,8 +73,7 @@ def train_model(
                 f"""Wimbledon period {period} with RMSE {forecast_objective}
                     compared to baseline {baseline_objective}"""
             )
-            if period >= 7:
-                overall_rmse += forecast_objective
+            overall_rmse += forecast_objective
 
         # Calculate the decay in the weight
         max_date = period_data["match_date"].iloc[-1]
@@ -85,8 +83,7 @@ def train_model(
         weight_decay = np.power(temporal_decay, date_difference / 365)
 
         # Add in surface weights
-        weight_decay[period_data["Surface"] == "Hard"] *= hard_weight
-        weight_decay[period_data["Surface"] == "Clay"] *= clay_weight
+        weight_decay[period_data["Surface"] == "Grass"] *= grass_weight
 
         # Decay the existing data in the weights matrix
         existing_decay_days = (
@@ -109,7 +106,14 @@ def train_model(
 
         # Update the previous weight date
         previous_period_end_date = max_date
-    return forecast_objective
+    if return_player_strengths:
+        player_strengths = create_player_strengths(edge_weights, edge_values)
+        player_strength_map = {
+            name: strength for name, strength in zip(player_names, player_strengths)
+        }
+        return 0.0, player_strength_map
+    else:
+        return forecast_objective, None
 
 
 def run_wimbledon_forecast(
@@ -199,7 +203,14 @@ def create_player_strengths(
 
     # Extract optimal strengths
     optimised_results = minimize(
-        player_ranking_objective, np.zeros(len(edge_weights)), method="L-BFGS-B"
+        player_ranking_objective,
+        np.zeros(len(edge_weights)),
+        method="L-BFGS-B",
+        options={
+            "maxiter": 100_000,  # or any large number
+            "maxfun": 100_000,  # optional, can be set if needed
+            "disp": True,  # optional, shows convergence messages
+        },
     )
     print(
         f"""Optimisation terminated with {optimised_results.message}
