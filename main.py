@@ -1,6 +1,6 @@
 import argparse
 from src.main_package.model.fit_parameters import fit_parameters
-from src.main_package.model.predict import predict_wimbledon_prize_money
+from src.main_package.model.predict import predict_tournament_prize_money
 from src.main_package.model.assign_tokens import assign_tokens
 from src.main_package.model.utils import ModelParameters
 import pandas as pd
@@ -23,11 +23,11 @@ def run_token_pipeline(train: bool = False):
     parameters = ModelParameters(temporal_decay=0.05, grass_weight=20.0)
 
     # Calculate the estimated prize money
-    male_prize_money = predict_wimbledon_prize_money(True, parameters)
+    male_prize_money = predict_tournament_prize_money(True, parameters)
 
     # Define the parameters
     parameters = ModelParameters(temporal_decay=0.05, grass_weight=50.0)
-    female_prize_money = predict_wimbledon_prize_money(False, parameters)
+    female_prize_money = predict_tournament_prize_money(False, parameters)
 
     # Concatenate the prize money from the two tournaments
     combined_prize_money = pd.concat(

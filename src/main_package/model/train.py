@@ -9,8 +9,11 @@ from typing import Tuple, Optional, Dict
 def train_model(
     temporal_decay: float = 0.2,
     grass_weight: float = 4.0,
+    clay_weight:float = 1.0,
     male_data: bool = True,
     return_player_strengths: bool = False,
+    tournament:str = "Wimbledon",
+    tournament_year:int = 2025
 ) -> Tuple[float, Optional[Dict[str, float]]]:
     """
     Train the model.
@@ -27,8 +30,14 @@ def train_model(
         temporal_decay (float): The amount of decay that the weight we place
             on inter-player matches experiences in a year
         grass_weight (float): The additional (multiplicative) weight we give to
-            grass court matches
+            grass court matches in reference to a weight of 1 for hard court
+        clay_weight (float): The additional (multiplicative) weight we give to
+            clay matches, in reference to a weight of 1 for hard court
         male_data (bool): Whether or not we want the male data
+        return_player_strengths (bool): Whether or not to return the player strengths
+            or simply the forecasting objective
+        tournament (str): The tournament to forecast
+        tournament_year (int): The year of the tournament to forecast
 
     Returns:
         float: The average RMSE over the years 2022-2024
@@ -46,11 +55,11 @@ def train_model(
     edge_values = np.zeros((len(player_index_map), len(player_index_map)))
     edge_weights = np.zeros((len(player_index_map), len(player_index_map)))
 
-    # Split the data into pre-Wimbledon periods.
-    wimbledon_filter = (training_dataset["Tournament"] == "Wimbledon").to_numpy()
-    wimbledon_change = wimbledon_filter[1:] != wimbledon_filter[:-1]
+    # Split the data into pre-tournament periods.
+    tournament_filter = (training_dataset["Tournament"] == tournament).to_numpy()
+    tournament_change = tournament_filter[1:] != tournament_filter[:-1]
     training_dataset["period_index"] = np.append(
-        np.array([0]), np.cumsum(wimbledon_change)
+        np.array([0]), np.cumsum(tournament_change)
     )
 
     # Iterate through the train and test periods
@@ -64,13 +73,18 @@ def train_model(
     for period in range(len(period_grouped_data)):
         period_data = period_grouped_data.get_group(period)
 
+        # Check whether the target tournament is in the data and break the loop if so
+        target_filter = (period_data['Tournament'] == tournament)&(period_data['match_date'].apply(lambda x:x.year) == tournament_year)
+        if target_filter.any():
+            break
+
         if period % 2 == 1 and period > 7 and not return_player_strengths:
             print(f"Running forecast for period {period}...")
-            forecast_objective, baseline_objective = run_wimbledon_forecast(
+            forecast_objective, baseline_objective = run_tournament_forecast(
                 period_data, edge_weights, edge_values
             )
             print(
-                f"""Wimbledon period {period} with RMSE {forecast_objective}
+                f"""Tournament period {period} with RMSE {forecast_objective}
                     compared to baseline {baseline_objective}"""
             )
             overall_rmse += forecast_objective
@@ -84,6 +98,7 @@ def train_model(
 
         # Add in surface weights
         weight_decay[period_data["Surface"] == "Grass"] *= grass_weight
+        weight_decay[period_data["Surface"] == "Clay"] *= clay_weight
 
         # Decay the existing data in the weights matrix
         existing_decay_days = (
@@ -116,11 +131,11 @@ def train_model(
         return forecast_objective, None
 
 
-def run_wimbledon_forecast(
+def run_tournament_forecast(
     results_data: pd.DataFrame, edge_weights: np.ndarray, edge_values: np.ndarray
 ) -> Tuple[float, float]:
     """
-    Run the Wimbledon forecast based on the data
+    Run the tournament forecast based on the data
 
     Args:
         edge_weights (np.ndarray): The edge weights
@@ -141,7 +156,7 @@ def run_wimbledon_forecast(
         1 + np.exp(winner_strength - loser_strength)
     )
     results_data[["Winner", "Loser", "true_win_prob", "estimated_probability"]].to_csv(
-        "wimbledon_forecast_results.csv", index=False
+        "tournament_forecast_results.csv", index=False
     )
 
     # Create the objective value and baseline
@@ -167,7 +182,7 @@ def create_player_strengths(
     edge_weights: np.ndarray, edge_values: np.ndarray
 ) -> np.ndarray:
     """
-    Run the Wimbledon forecast based on the data
+    Run the tournament forecast based on the data
 
     Args:
         edge_weights (np.ndarray): The edge weights

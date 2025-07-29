@@ -4,11 +4,11 @@ from .utils import define_prize_money, ModelParameters
 from src.main_package.model.train import train_model
 
 
-def predict_wimbledon_prize_money(
+def predict_tournament_prize_money(
     male_data: bool, model_parameters: ModelParameters
 ) -> pd.DataFrame:
     """
-    Predict the prize money that each player will get in Wimbledon
+    Predict the prize money that each player will get in the tournament
 
     Args:
         male_data (bool): Whether or not we want male data
@@ -22,6 +22,11 @@ def predict_wimbledon_prize_money(
         male_data=male_data,
         return_player_strengths=True,
     )
+
+    # Dump the player strength maps
+    suffix = 'male' if male_data else 'female'
+    pd.Series(player_strength_map).to_csv(f'player_strengths_{suffix}.csv')
+
 
     # Load the draw. We expect the CSV to contain players in the same order as the tree
     tournament_draw = load_draw(male_data)
@@ -63,8 +68,15 @@ def predict_wimbledon_prize_money(
                     block_size * block_index : block_size * (block_index + 1),
                 ]
             )
-    # Calculate prize money
+    # Calculate and save the round reached
     round_reached_probability = progression[:-1] - progression[1:]
+    round_reached_dataframe = pd.DataFrame(round_reached_probability.T,
+                                           columns = [f'round_{x}' for x in range(8)])
+    round_reached_dataframe['player_name'] = tournament_draw['player_name']
+    round_reached_dataframe.to_csv(f'predicted_round_reached_dataframe_{suffix}.csv', index=False)
+
+    # Calculate prize money
+    
     prize_money = define_prize_money()
     tournament_draw["mean_prize_money"] = np.sum(
         round_reached_probability * prize_money[:, np.newaxis], axis=0
@@ -83,6 +95,6 @@ def load_draw(male_data: bool) -> pd.DataFrame:
         pd.DataFrame: The draw data
     """
     if male_data:
-        return pd.read_csv("src/main_package/data/wimbledon_male.csv")
+        return pd.read_csv("src/main_package/data/tournament_male.csv")
     else:
-        return pd.read_csv("src/main_package/data/wimbledon_female.csv")
+        return pd.read_csv("src/main_package/data/tournament_female.csv")
