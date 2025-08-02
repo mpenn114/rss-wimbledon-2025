@@ -27,7 +27,8 @@ def run_token_pipeline(
         train (bool): Whether to fit the parameters, or run the
             main pipeline
         grass_weight_male (float): The weight to put on grass matches for male players
-        grass_weight_female (float): The weight to put on grass matches for female playres
+        grass_weight_female (float): The weight to put on grass matches for female
+            players
         clay_weight_male (float): The weight to put on clay matches for male players
         clay_weight_female (float): The weight to put on clay matches for female players
         calculate_strengths_only (bool): Whether to run the full pipeline, or
@@ -105,28 +106,28 @@ if __name__ == "__main__":
         "--grass-weight-male",
         type=float,
         default=1.0,
-        help="The weight to put on grass results for male players, relative to a weight of 1 for hard court",
+        help="The weight to put on grass results for male players, relative to a weight of 1 for hard court",  # noqa: E501
     )
 
     parser.add_argument(
         "--grass-weight-female",
         type=float,
         default=1.0,
-        help="The weight to put on grass results for female players, relative to a weight of 1 for hard court",
+        help="The weight to put on grass results for female players, relative to a weight of 1 for hard court",  # noqa: E501
     )
 
     parser.add_argument(
         "--clay-weight-male",
         type=float,
         default=1.0,
-        help="The weight to put on clay results for male players, relative to a weight of 1 for hard court",
+        help="The weight to put on clay results for male players, relative to a weight of 1 for hard court",  # noqa: E501
     )
 
     parser.add_argument(
         "--clay-weight-female",
         type=float,
         default=1.0,
-        help="The weight to put on clay results for female players, relative to a weight of 1 for hard court",
+        help="The weight to put on clay results for female players, relative to a weight of 1 for hard court",  # noqa: E501
     )
 
     parser.add_argument(

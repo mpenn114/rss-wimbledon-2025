@@ -132,7 +132,7 @@ def load_draw(male_data: bool, tournament: str, tournament_year: int) -> pd.Data
 
     if not os.path.isfile(file_path):
         raise ValueError(
-            f"Tournament {tournament} could not have prize-money forecasts performed because no draw information was found at {file_path}!"
+            f"Tournament {tournament} could not have prize-money forecasts performed because no draw information was found at {file_path}!"  # noqa: E501
         )
 
     return pd.read_csv(file_path)
