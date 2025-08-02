@@ -76,6 +76,7 @@ def train_model(
         # Check whether the target tournament is in the data and break the loop if so
         target_filter = (period_data['Tournament'] == tournament)&(period_data['match_date'].apply(lambda x:x.year) == tournament_year)
         if target_filter.any():
+            print(f'Ending training in period {period}')
             break
 
         if period % 2 == 1 and period > 7 and not return_player_strengths:
@@ -121,6 +122,7 @@ def train_model(
 
         # Update the previous weight date
         previous_period_end_date = max_date
+
     if return_player_strengths:
         player_strengths = create_player_strengths(edge_weights, edge_values)
         player_strength_map = {
@@ -222,9 +224,9 @@ def create_player_strengths(
         np.zeros(len(edge_weights)),
         method="L-BFGS-B",
         options={
-            "maxiter": 100_000,  # or any large number
-            "maxfun": 100_000,  # optional, can be set if needed
-            "disp": True,  # optional, shows convergence messages
+            "maxiter": 100_000,
+            "maxfun": 100_000,
+            "disp": True,
         },
     )
     print(
