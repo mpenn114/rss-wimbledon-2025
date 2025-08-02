@@ -9,11 +9,11 @@ from typing import Tuple, Optional, Dict
 def train_model(
     temporal_decay: float = 0.2,
     grass_weight: float = 4.0,
-    clay_weight:float = 1.0,
+    clay_weight: float = 1.0,
     male_data: bool = True,
     return_player_strengths: bool = False,
-    tournament:str = "Wimbledon",
-    tournament_year:int = 2025
+    tournament: str = "Wimbledon",
+    tournament_year: int = 2025,
 ) -> Tuple[float, Optional[Dict[str, float]]]:
     """
     Train the model.
@@ -74,9 +74,11 @@ def train_model(
         period_data = period_grouped_data.get_group(period)
 
         # Check whether the target tournament is in the data and break the loop if so
-        target_filter = (period_data['Tournament'] == tournament)&(period_data['match_date'].apply(lambda x:x.year) == tournament_year)
+        target_filter = (period_data["Tournament"] == tournament) & (
+            period_data["match_date"].apply(lambda x: x.year) == tournament_year
+        )
         if target_filter.any():
-            print(f'Ending training in period {period}')
+            print(f"Ending training in period {period}")
             break
 
         if period % 2 == 1 and period > 7 and not return_player_strengths:

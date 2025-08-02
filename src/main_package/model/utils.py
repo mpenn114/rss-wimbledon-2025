@@ -9,6 +9,7 @@ class ModelParameters(TypedDict):
 
     temporal_decay: float
     grass_weight: float
+    clay_weight: float
 
 
 def define_prize_money() -> np.ndarray:

@@ -22,7 +22,7 @@ Mac:
 curl -Ls https://astral.sh/uv/install.sh | bash
 ```
 
-Functions within this repository can then be run by using 
+Functions within this repository can then be run by using
 
 ```bash
 PYTHONPATH=. uv run path/to/functon.py

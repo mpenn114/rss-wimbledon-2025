@@ -4,10 +4,14 @@ from .utils import define_prize_money, ModelParameters
 from src.main_package.model.train import train_model
 import os
 from typing import Optional
+
+
 def predict_tournament_prize_money(
-    male_data: bool, model_parameters: ModelParameters,
-    tournament:str, tournament_year:int,
-    strength_forecast_only:bool = False
+    male_data: bool,
+    model_parameters: ModelParameters,
+    tournament: str,
+    tournament_year: int,
+    strength_forecast_only: bool = False,
 ) -> Optional[pd.DataFrame]:
     """
     Predict the prize money that each player will get in the tournament
@@ -28,21 +32,23 @@ def predict_tournament_prize_money(
     _, player_strength_map = train_model(
         temporal_decay=model_parameters["temporal_decay"],
         grass_weight=model_parameters["grass_weight"],
-        clay_weight=model_parameters['clay_weight'],
+        clay_weight=model_parameters["clay_weight"],
         male_data=male_data,
         return_player_strengths=True,
-        tournament = tournament,
-        tournament_year = tournament_year
+        tournament=tournament,
+        tournament_year=tournament_year,
     )
 
     # Dump the player strength maps
-    suffix = 'male' if male_data else 'female'
-    pd.Series(player_strength_map).to_csv(f'results/player_strengths_{suffix}_{tournament}_{tournament_year}.csv')
+    suffix = "male" if male_data else "female"
+    pd.Series(player_strength_map).to_csv(
+        f"results/player_strengths_{suffix}_{tournament}_{tournament_year}.csv"
+    )
 
     # Stop the pipeline here if needed
     if strength_forecast_only:
         return
-    
+
     # Load the draw. We expect the CSV to contain players in the same order as the tree
     tournament_draw = load_draw(male_data, tournament, tournament_year)
     player_strengths_pd = tournament_draw["player_name"].map(player_strength_map)
@@ -85,13 +91,17 @@ def predict_tournament_prize_money(
             )
     # Calculate and save the round reached
     round_reached_probability = progression[:-1] - progression[1:]
-    round_reached_dataframe = pd.DataFrame(round_reached_probability.T,
-                                           columns = [f'round_{x}' for x in range(8)])
-    round_reached_dataframe['player_name'] = tournament_draw['player_name']
-    round_reached_dataframe.to_csv(f'results/predicted_round_reached_dataframe_{suffix}_{tournament}_{tournament_year}.csv', index=False)
+    round_reached_dataframe = pd.DataFrame(
+        round_reached_probability.T, columns=[f"round_{x}" for x in range(8)]
+    )
+    round_reached_dataframe["player_name"] = tournament_draw["player_name"]
+    round_reached_dataframe.to_csv(
+        f"results/predicted_round_reached_dataframe_{suffix}_{tournament}_{tournament_year}.csv",
+        index=False,
+    )
 
     # Calculate prize money
-    
+
     prize_money = define_prize_money()
     tournament_draw["mean_prize_money"] = np.sum(
         round_reached_probability * prize_money[:, np.newaxis], axis=0
@@ -99,7 +109,7 @@ def predict_tournament_prize_money(
     return tournament_draw
 
 
-def load_draw(male_data: bool, tournament:str, tournament_year:int) -> pd.DataFrame:
+def load_draw(male_data: bool, tournament: str, tournament_year: int) -> pd.DataFrame:
     """
     Load a demo version of the draw for testing
 
@@ -112,11 +122,17 @@ def load_draw(male_data: bool, tournament:str, tournament_year:int) -> pd.DataFr
         pd.DataFrame: The draw data
     """
     if male_data:
-        file_path= f"src/main_package/data/draws/{tournament}_{tournament_year}_male.csv"
+        file_path = (
+            f"src/main_package/data/draws/{tournament}_{tournament_year}_male.csv"
+        )
     else:
-        file_path= f"src/main_package/data/draws/{tournament}_{tournament_year}_female.csv"
+        file_path = (
+            f"src/main_package/data/draws/{tournament}_{tournament_year}_female.csv"
+        )
 
     if not os.path.isfile(file_path):
-        raise ValueError(f"Tournament {tournament} could not have prize-money forecasts performed because no draw information was found at {file_path}!")
+        raise ValueError(
+            f"Tournament {tournament} could not have prize-money forecasts performed because no draw information was found at {file_path}!"
+        )
 
     return pd.read_csv(file_path)
