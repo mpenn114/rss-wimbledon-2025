@@ -4,7 +4,7 @@ from src.main_package.model.predict import predict_tournament_prize_money
 from src.main_package.model.assign_tokens import assign_tokens
 from src.main_package.model.utils import ModelParameters
 import pandas as pd
-
+import os
 
 def run_token_pipeline(
     tournament: str = "Wimbledon",
@@ -34,6 +34,10 @@ def run_token_pipeline(
         calculate_strengths_only (bool): Whether to run the full pipeline, or
             only calculate the player strengths
     """
+    # Create the results directory if necessary
+    if not os.path.isdir('results'):
+        os.mkdir('results')
+    
     if train:
         fit_parameters(male_data=True)
         fit_parameters(male_data=False)
