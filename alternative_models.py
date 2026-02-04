@@ -1,5 +1,7 @@
 import argparse
-from src.alternative_models.model_registry import ModelRegistry, run_model
+from src.alternative_models.model_registry import run_model
+
+
 
 def main():
     parser = argparse.ArgumentParser(description="Run Alternative Tournament Models")
