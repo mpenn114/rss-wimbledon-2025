@@ -18,7 +18,7 @@ class EloModel(BaseAlternativeModel):
     """
     
     def __init__(self, k_factor: float = 32, initial_rating: float = 1500, 
-                 rating_decay: float = 0.0, surface_adjustment: bool = False):
+                 rating_decay: float = 0.0, surface_adjustment: bool = True):
         """
         Initialize the ELO model.
         

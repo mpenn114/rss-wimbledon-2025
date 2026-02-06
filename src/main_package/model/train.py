@@ -226,8 +226,8 @@ def create_player_strengths(
         np.zeros(len(edge_weights)),
         method="L-BFGS-B",
         options={
-            "maxiter": 1000,
-            "maxfun": 1000,
+            "maxiter": 100_000,
+            "maxfun": 100_000,
             "disp": True,
         },
     )

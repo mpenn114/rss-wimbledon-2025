@@ -38,7 +38,8 @@ class CatBoostTennisModel(BaseAlternativeModel):
             'loss_function': 'Logloss',
             'eval_metric': 'Logloss',
             'random_seed': 42,
-            'verbose': False
+            'verbose': False,
+            "early_stopping_rounds":50
         }
 
         self.model = None
@@ -199,7 +200,7 @@ class CatBoostTennisModel(BaseAlternativeModel):
 
         return X, y
 
-    def predict(self, target_tournament: str, target_year: int, male_data: bool):
+    def predict(self, target_tournament: str, target_year: int, male_data: bool, val_perc:float = 0.1):
         """
         Create model predictions for the selected tournament and year.
 
@@ -207,6 +208,7 @@ class CatBoostTennisModel(BaseAlternativeModel):
             target_tournament (str): The name of the tournament we are targeting
             target_year (int): The year of the tournament we want to predict
             male_data (bool): Whether or not we want to perform these predictions on male data
+            val_perc (float): The percentage of data to validate on in training
         """
         # Load all data
         all_data = self._get_data(male_data)
@@ -232,6 +234,9 @@ class CatBoostTennisModel(BaseAlternativeModel):
 
         # Prepare training data
         X_train, y_train = self._prepare_training_data(training_data)
+
+        # Split into train and val
+        val_filter = np.random.random(size=len(X_train)) < val_perc
         self.feature_columns = X_train.columns
 
         print(f"Extracted {X_train.shape[1]} features")
@@ -240,7 +245,8 @@ class CatBoostTennisModel(BaseAlternativeModel):
         # Train CatBoost model
         print("\nTraining CatBoost model...")
         self.model = CatBoostClassifier(**self.catboost_params)
-        self.model.fit(X_train, y_train)
+        self.model.fit(X_train[~val_filter], y_train[~val_filter],eval_set=(X_train[val_filter],y_train[val_filter]),
+                       use_best_model=True)
 
         # Make predictions on target tournament
         predictions = []
