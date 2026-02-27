@@ -9,6 +9,7 @@ MODELS=(
   "bradley_terry_model"
   "elo_model"
   "random_forest_model"
+  "bookmaker_odds_model"
 )
 
 TOURNAMENTS=(

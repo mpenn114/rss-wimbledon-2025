@@ -1,6 +1,6 @@
 # Configuration
 $scriptName = "alternative_models.py"
-$models = @('bradley_terry_model', 'elo_model', 'random_forest_model')
+$models = @('bradley_terry_model', 'elo_model', 'random_forest_model', 'bookmaker_odds_model')
 $tournaments = @('Australian Open', 'French Open', 'Wimbledon', 'US Open')
 $years = @(2024, 2025)
 
