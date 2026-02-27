@@ -7,7 +7,7 @@ $years = @(2024, 2025)
 foreach ($model in $models) {
     foreach ($tournament in $tournaments) {
         foreach ($year in $years) {
-            
+
             # Exclusion logic: Skip US Open for the year 2025
             if ($tournament -eq "US Open" -and $year -eq 2025) {
                 Write-Host "Skipping $tournament for $year as requested." -ForegroundColor Yellow

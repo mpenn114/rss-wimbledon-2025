@@ -2,16 +2,17 @@ import pandas as pd
 from datetime import datetime
 from abc import abstractmethod, ABC
 import os
-class BaseAlternativeModel(ABC):
 
+
+class BaseAlternativeModel(ABC):
     def __init__(self):
         """
         Define the base class for alternative models
         """
         self.name = self.__class__.__name__.lower()
-    
+
     @abstractmethod
-    def predict(self, target_tournament:str, target_year:int, male_data:bool):
+    def predict(self, target_tournament: str, target_year: int, male_data: bool):
         """
         Create the model predictions for the selected tournament and year
 
@@ -22,7 +23,13 @@ class BaseAlternativeModel(ABC):
                 data
         """
 
-    def _save_predictions(self, prediction_data:pd.DataFrame, target_tournament:str, target_year:int, male_data:bool):
+    def _save_predictions(
+        self,
+        prediction_data: pd.DataFrame,
+        target_tournament: str,
+        target_year: int,
+        male_data: bool,
+    ):
         """
         Save the predictions to a CSV
 
@@ -42,9 +49,9 @@ class BaseAlternativeModel(ABC):
         male_string = "male" if male_data else "female"
         prediction_data.to_csv(
             f"{self.name}/{male_string}_{target_tournament.lower()}_{target_year}.csv",
-                               index=False
-                               )
-        
+            index=False,
+        )
+
     @staticmethod
     def _get_data(male_data: bool) -> pd.DataFrame:
         """
@@ -70,16 +77,18 @@ class BaseAlternativeModel(ABC):
         combined_df["match_date"] = combined_df["Date"].apply(
             lambda x: datetime.strptime(x, "%m/%d/%Y")
         )
-        
+
         # Create a five-set filter
-        combined_df['five_sets'] = False
+        combined_df["five_sets"] = False
         five_set_mens_tournaments = [
-        "Australian Open",
-        "French Open",
-        "Wimbledon",
-        "US Open",
-    ]
+            "Australian Open",
+            "French Open",
+            "Wimbledon",
+            "US Open",
+        ]
         if male_data:
-            combined_df.loc[combined_df["Tournament"].isin(five_set_mens_tournaments), 'five_sets'] = True
+            combined_df.loc[
+                combined_df["Tournament"].isin(five_set_mens_tournaments), "five_sets"
+            ] = True
 
         return combined_df

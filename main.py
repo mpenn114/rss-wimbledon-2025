@@ -6,6 +6,7 @@ from src.main_package.model.utils import ModelParameters
 import pandas as pd
 import os
 
+
 def run_token_pipeline(
     tournament: str = "Wimbledon",
     tournament_year: int = 2025,
@@ -35,9 +36,9 @@ def run_token_pipeline(
             only calculate the player strengths
     """
     # Create the results directory if necessary
-    if not os.path.isdir('results'):
-        os.mkdir('results')
-    
+    if not os.path.isdir("results"):
+        os.mkdir("results")
+
     if train:
         fit_parameters(male_data=True)
         fit_parameters(male_data=False)
