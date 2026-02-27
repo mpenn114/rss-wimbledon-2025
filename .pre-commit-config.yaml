@@ -15,4 +15,6 @@ repos:
     rev: v0.4.4
     hooks:
       - id: ruff
-        args: [--select=E]
+        args:
+          - "--line-length=150"
+          - "--select=E,F,W"
